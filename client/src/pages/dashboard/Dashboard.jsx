@@ -44,7 +44,7 @@ export default function Dashboard() {
 
         {/* Community */}
         <div
-          onClick={() => navigate("/issues")}
+          onClick={() => navigate("/issues/new")}
           className="cursor-pointer rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white shadow-lg hover:scale-[1.02] transition"
         >
           <h2 className="text-xl font-semibold mb-2">🌍 Community Issues</h2>
