@@ -1,13 +1,20 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import Loader from "./Loader";
 
 export default function ProtectedRoute({ children }) {
-  const { isLoggedIn, loading } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (loading) return <Loader text="Checking login..." />;
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
-  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return children;
 }

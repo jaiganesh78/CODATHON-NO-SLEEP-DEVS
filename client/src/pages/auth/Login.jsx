@@ -27,95 +27,99 @@ export default function Login() {
       setLoading(false);
     }
   };
+return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-sky-500 to-green-500 flex items-center justify-center">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
 
-  return (
-    <AuthLayout
-      title="Sign in"
-      subtitle="Enter your email and password to access your account."
-    >
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div>
-          <label className="text-sm font-medium text-zinc-700">Email</label>
+        <h2 className="text-2xl font-bold text-center text-slate-800">
+          Sign In
+        </h2>
+
+        <p className="text-center text-gray-500 mt-1">
+          Access your civic dashboard
+        </p>
+
+        <form onSubmit={onSubmit} className="mt-6 space-y-4">
+
           <input
             name="email"
-            type="email"
             value={form.email}
             onChange={onChange}
-            placeholder="you@example.com"
-            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-900"
+            type="email"
+            placeholder="Email address"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
             required
           />
-        </div>
 
-        <div>
-          <label className="text-sm font-medium text-zinc-700">Password</label>
           <input
             name="password"
-            type="password"
             value={form.password}
             onChange={onChange}
-            placeholder="••••••••"
-            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-900"
+            type="password"
+            placeholder="Password"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
             required
           />
-        </div>
 
-        <div className="flex items-center justify-between text-sm">
-          <label className="flex items-center gap-2 text-zinc-600">
-            <input type="checkbox" className="h-4 w-4 rounded border-zinc-300" />
-            Remember me
-          </label>
+          <div className="flex justify-between text-sm text-gray-600">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" />
+              Remember me
+            </label>
 
-          <Link
-            to="/forgot-password"
-            className="font-medium text-zinc-900 hover:underline"
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
           >
-            Forgot password?
-          </Link>
-        </div>
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
 
-        <button
-  disabled={loading}
-  className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
->
-  {loading ? "Signing in..." : "Sign in"}
-</button>
+          {/* Divider */}
+          <div className="relative py-3">
+            <div className="h-px bg-gray-300" />
+            <span className="absolute left-1/2 -translate-x-1/2 -top-2 bg-white px-3 text-sm text-gray-400">
+              OR
+            </span>
+          </div>
 
+          {/* Google Login */}
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (res) => {
+                try {
+                  const data = await googleLogin(res.credential);
+                  storage.setToken(data.token);
+                  await loadUser();
+                  toast.success("Google login successful ✅");
+                  navigate("/dashboard");
+                } catch {
+                  toast.error("Google login failed");
+                }
+              }}
+              onError={() => toast.error("Google login failed")}
+            />
+          </div>
 
-        <div className="relative py-2">
-          <div className="h-px w-full bg-zinc-200" />
-          <span className="absolute left-1/2 -translate-x-1/2 -top-1 bg-white px-3 text-xs text-zinc-400">
-            OR
-          </span>
-        </div>
-
-        {/* Google placeholder */}
-       <div className="flex justify-center">
-  <GoogleLogin
-    onSuccess={async (credentialResponse) => {
-      try {
-        const data = await googleLogin(credentialResponse.credential);
-        storage.setToken(data.token);
-        await loadUser();
-        toast.success("Google login success ✅");
-        navigate("/dashboard");
-      } catch (err) {
-        toast.error(err?.response?.data?.message || "Google login failed");
-      }
-    }}
-    onError={() => toast.error("Google login failed")}
-  />
-</div>
-
-
-
-        <p className="text-center text-sm text-zinc-600">
-          Don’t have an account?{" "}
-          <Link to="/register" className="font-semibold text-zinc-900 hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </form>
-    </AuthLayout>
+          <p className="text-center text-sm text-gray-600 mt-4">
+            Don’t have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
+        </form>
+      </div>
+    </div>
   );
 }

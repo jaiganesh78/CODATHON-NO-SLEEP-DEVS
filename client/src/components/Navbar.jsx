@@ -1,78 +1,120 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Navbar() {
   const { isLoggedIn, isAdmin, user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // ✅ HIDE NAVBAR ON AUTH PAGES
+  const hideNavbar =
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/forgot-password" ||
+    location.pathname === "/reset-password";
+
+  if (hideNavbar) return null;
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  const navBase =
+    "px-3 py-2 rounded-xl transition font-medium";
+
+  const active =
+    "bg-orange-500 text-white shadow";
+
+  const inactive =
+    "text-white hover:bg-white/10";
+
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur">
+    <nav className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="font-bold text-lg tracking-wide">
-          ⚡ Hackathon Starter
-        </Link>
+
+        {/* LOGO */}
+        <NavLink to="/dashboard" className="font-bold text-white text-lg">
+          ⚡ CIVICWATCH
+        </NavLink>
 
         <div className="flex items-center gap-3">
+
           {!isLoggedIn ? (
             <>
-              <Link
+              <NavLink
                 to="/login"
-                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
+                className={({ isActive }) =>
+                  `${navBase} ${isActive ? active : inactive}`
+                }
               >
                 Login
-              </Link>
-              <Link
+              </NavLink>
+
+              <NavLink
                 to="/register"
-                className="px-3 py-2 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition"
+                className="px-3 py-2 rounded-xl bg-white text-black font-semibold hover:bg-white/90"
               >
                 Register
-              </Link>
-              <Link
-                to="/admin/login"
-                className="px-3 py-2 rounded-xl border border-white/15 hover:bg-white/10 transition"
-              >
-                Admin
-              </Link>
+              </NavLink>
             </>
           ) : (
             <>
-              <Link
+              <NavLink
                 to="/dashboard"
-                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
+                className={({ isActive }) =>
+                  `${navBase} ${isActive ? active : inactive}`
+                }
               >
                 Dashboard
-              </Link>
-              <Link
+              </NavLink>
+
+              <NavLink
+                to="/issues/new"
+                className={({ isActive }) =>
+                  `${navBase} ${isActive ? active : inactive}`
+                }
+              >
+                Report Issue
+              </NavLink>
+
+              <NavLink
+                to="/issues"
+                className={({ isActive }) =>
+                  `${navBase} ${isActive ? active : inactive}`
+                }
+              >
+                Issues
+              </NavLink>
+
+              <NavLink
                 to="/account"
-                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
+                className={({ isActive }) =>
+                  `${navBase} ${isActive ? active : inactive}`
+                }
               >
                 Account
-              </Link>
+              </NavLink>
 
               {isAdmin && (
-                <Link
+                <NavLink
                   to="/admin/dashboard"
-                  className="px-3 py-2 rounded-xl bg-emerald-400 text-black font-semibold hover:bg-emerald-300 transition"
+                  className="px-3 py-2 rounded-xl bg-emerald-400 text-black font-semibold hover:bg-emerald-300"
                 >
-                  Admin Panel
-                </Link>
+                  Admin
+                </NavLink>
               )}
 
               <button
                 onClick={handleLogout}
-                className="px-3 py-2 rounded-xl bg-red-500/90 hover:bg-red-500 transition font-semibold"
+                className="px-3 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600"
               >
                 Logout
               </button>
 
-              <div className="hidden sm:block text-sm text-slate-300 ml-2">
+              <span className="hidden sm:block text-sm text-slate-300 ml-2">
                 {user?.email}
-              </div>
+              </span>
             </>
           )}
         </div>

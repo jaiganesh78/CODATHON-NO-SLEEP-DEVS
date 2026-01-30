@@ -37,14 +37,7 @@ export default function Account() {
             </div>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-orange-200 bg-orange-50 p-5">
-            <p className="font-semibold text-orange-700">
-              Tip ✅
-            </p>
-            <p className="mt-1 text-sm text-orange-700/90">
-              For hackathon: keep account simple. Don’t waste time building profile edits unless required.
-            </p>
-          </div>
+          
         </div>
       </div>
     </div>
