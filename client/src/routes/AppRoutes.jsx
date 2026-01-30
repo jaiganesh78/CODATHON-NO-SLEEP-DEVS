@@ -14,6 +14,8 @@ import Account from "../pages/account/Account";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import CreateIssue from "../pages/issues/CreateIssue";
 
+import IssueFeed from "../pages/issues/IssueFeed";
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -35,6 +37,17 @@ export default function AppRoutes() {
         }
       />
 
+      {/* Issues Feed */}
+      <Route
+        path="/issues"
+        element={
+          <ProtectedRoute>
+            <IssueFeed />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Create Issue */}
       <Route
         path="/issues/new"
         element={
@@ -43,6 +56,7 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
 
       <Route
         path="/account"

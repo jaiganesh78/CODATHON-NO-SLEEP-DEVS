@@ -70,21 +70,22 @@ export default function Navbar() {
               </NavLink>
 
               <NavLink
+                to="/issues"
+                end
+                className={({ isActive }) =>
+                  `${navBase} ${isActive ? active : inactive}`
+                }
+              >
+                Issues
+              </NavLink>
+
+              <NavLink
                 to="/issues/new"
                 className={({ isActive }) =>
                   `${navBase} ${isActive ? active : inactive}`
                 }
               >
                 Report Issue
-              </NavLink>
-
-              <NavLink
-                to="/issues"
-                className={({ isActive }) =>
-                  `${navBase} ${isActive ? active : inactive}`
-                }
-              >
-                Issues
               </NavLink>
 
               <NavLink
