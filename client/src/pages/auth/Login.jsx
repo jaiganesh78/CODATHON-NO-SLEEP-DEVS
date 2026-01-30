@@ -16,17 +16,34 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+const onSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await login(form);
-      navigate("/dashboard");
-    } finally {
-      setLoading(false);
+  try {
+    // ✅ ADMIN LOGIN
+    if (
+      form.email === "admin@hackathon.com" &&
+      form.password === "Admin@123"
+    ) {
+      localStorage.setItem("admin", "true");
+      toast.success("Admin login successful ✅");
+      navigate("/admin/dashboard");
+      return;
     }
-  };
+
+    // ✅ NORMAL USER LOGIN
+    await login(form);
+    navigate("/dashboard");
+
+  } catch (err) {
+    toast.error("Invalid credentials");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-sky-500 to-green-500 flex items-center justify-center">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">

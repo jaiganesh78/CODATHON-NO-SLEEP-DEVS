@@ -1,15 +1,11 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import Loader from "./Loader";
 
 export default function AdminRoute({ children }) {
-  const { isLoggedIn, isAdmin, loading } = useAuth();
+  const isAdmin = localStorage.getItem("admin") === "true";
 
-  if (loading) return <Loader text="Checking admin access..." />;
-
-  if (!isLoggedIn) return <Navigate to="/admin/login" replace />;
-
-  if (!isAdmin) return <Navigate to="/dashboard" replace />;
+  if (!isAdmin) {
+    return <Navigate to="/login" replace />;
+  }
 
   return children;
 }
