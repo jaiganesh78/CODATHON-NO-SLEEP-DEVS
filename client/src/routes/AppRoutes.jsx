@@ -13,6 +13,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Account from "../pages/account/Account";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import CreateIssue from "../pages/issues/CreateIssue";
+import LiveMap from "../pages/map/LiveMap";
 
 import IssueFeed from "../pages/issues/IssueFeed";
 
@@ -25,6 +26,8 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/map" element={<LiveMap />} />
+
       
 
       {/* Protected */}

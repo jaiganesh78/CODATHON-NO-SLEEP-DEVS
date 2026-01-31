@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import ComplaintStatus from "../../components/complaintStatus";
+
 import Speedometer from "../../components/speedometer";
 
 
@@ -67,6 +68,23 @@ export default function Dashboard() {
           and support your community by upvoting problems.
         </p>
       </div>
+      {/* Live Map Card */}
+<div
+  onClick={() => navigate("/map")}
+  className="cursor-pointer rounded-3xl 
+  bg-gradient-to-r from-green-500 to-green-600 
+  p-10 text-white shadow-xl 
+  hover:scale-[1.03] transition min-h-[180px]"
+>
+  <h2 className="text-2xl font-semibold mb-3">
+    🗺️ Live Civic Map
+  </h2>
+  <p className="text-sm opacity-90 leading-relaxed">
+    View all reported civic issues on a live interactive map.
+    Track problem locations and their status in real-time.
+  </p>
+</div>
+
     </div>
     {/* ABOUT CIVICWATCH */}
     <div className="bg-white rounded-2xl shadow p-8">
@@ -94,6 +112,7 @@ export default function Dashboard() {
       </p>
     </div>
     <div>
+      
     <Speedometer />
     
      </div>

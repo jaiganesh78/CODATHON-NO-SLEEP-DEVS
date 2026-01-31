@@ -1,6 +1,7 @@
 import { useState } from "react";
 import IssuePieChart from "../../components/IssuePieChart";
 import IssueBarChart from "../../components/IssueBarChart";
+import MapView from "../../components/MapView";
 
 
 export default function AdminDashboard() {
@@ -84,6 +85,14 @@ export default function AdminDashboard() {
             color="from-green-500 to-green-700"
             onClick={() => setActivePage("verify")}
           />
+           <DashboardCard
+  title="Live Issue Map 🗺️"
+  subtitle="View all complaints on map"
+  color="from-purple-500 to-purple-700"
+  onClick={() => setActivePage("map")}
+
+/>
+
         </div>
         {/* ===== ANALYTICS SECTION ===== */}
 <div className="grid md:grid-cols-2 gap-8 mt-10">
@@ -133,7 +142,33 @@ export default function AdminDashboard() {
       </PageWrapper>
     );
   }
+{/* ================= MAP VIEW ================= */}
+{activePage === "map" && (
+  <>
+    <BackButton onClick={() => setActivePage("dashboard")} />
 
+    <div className="bg-white p-6 rounded-xl shadow">
+      <MapView
+        issues={[
+          {
+            title: "Garbage Overflow",
+            description: "Not cleaned for 2 days",
+            lat: 13.0827,
+            lng: 80.2707,
+            status: "Pending",
+          },
+          {
+            title: "Streetlight Issue",
+            description: "Light not working",
+            lat: 13.09,
+            lng: 80.275,
+            status: "In Progress",
+          },
+        ]}
+      />
+    </div>
+  </>
+)}
   /* ================= PUBLIC ================= */
   if (activePage === "public") {
     return (
