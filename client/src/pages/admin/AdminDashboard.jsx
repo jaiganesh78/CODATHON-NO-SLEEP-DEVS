@@ -1,4 +1,6 @@
 import { useState } from "react";
+import IssuePieChart from "../../components/IssuePieChart";
+import IssueBarChart from "../../components/IssueBarChart";
 
 
 export default function AdminDashboard() {
@@ -83,6 +85,12 @@ export default function AdminDashboard() {
             onClick={() => setActivePage("verify")}
           />
         </div>
+        {/* ===== ANALYTICS SECTION ===== */}
+<div className="grid md:grid-cols-2 gap-8 mt-10">
+  <IssuePieChart />
+  <IssueBarChart />
+</div>
+
       </div>
     );
   }
