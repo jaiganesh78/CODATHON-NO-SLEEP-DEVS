@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { GoogleLogin } from "@react-oauth/google";
 
-import AuthLayout from "../../components/AuthLayout";
 import { registerUser, googleLogin } from "../../api/auth.api";
 import { storage } from "../../utils/storage";
 import { useAuth } from "../../hooks/useAuth";
@@ -12,112 +11,120 @@ export default function Register() {
   const navigate = useNavigate();
   const { loadUser } = useAuth();
 
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const onChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       await registerUser(form);
-      toast.success("Account created ✅");
+      toast.success("Account created successfully ✅");
       navigate("/login");
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Register failed");
+      toast.error(err?.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthLayout title="Create account" subtitle="Create your account in seconds.">
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* ✅ Google Signup */}
-        <div className="flex justify-center">
-          <GoogleLogin
-            text="signup_with"
-            onSuccess={async (credentialResponse) => {
-              try {
-                const data = await googleLogin(credentialResponse.credential);
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-sky-500 to-green-500 flex items-center justify-center">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
 
-                storage.setToken(data.token);
-                await loadUser();
+        <h2 className="text-2xl font-bold text-center text-slate-800">
+          Create Account
+        </h2>
+        <p className="text-center text-gray-500 mt-1">
+          Civic Issue Reporting Portal
+        </p>
 
-                toast.success("Signed up with Google ✅");
-                navigate("/dashboard");
-              } catch (err) {
-                toast.error(err?.response?.data?.message || "Google signup failed");
-              }
-            }}
-            onError={() => toast.error("Google signup failed")}
-          />
-        </div>
+        <form onSubmit={onSubmit} className="mt-6 space-y-4">
 
-        {/* divider */}
-        <div className="relative py-2">
-          <div className="h-px w-full bg-zinc-200" />
-          <span className="absolute left-1/2 -translate-x-1/2 -top-1 bg-white px-3 text-xs text-zinc-400">
-            OR
-          </span>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium text-zinc-700">Name</label>
           <input
             name="name"
             value={form.name}
             onChange={onChange}
-            placeholder="Your name"
-            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            type="text"
+            placeholder="Full Name"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
             required
           />
-        </div>
 
-        <div>
-          <label className="text-sm font-medium text-zinc-700">Email</label>
           <input
             name="email"
-            type="email"
             value={form.email}
             onChange={onChange}
-            placeholder="you@example.com"
-            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            type="email"
+            placeholder="Email Address"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
             required
           />
-        </div>
 
-        <div>
-          <label className="text-sm font-medium text-zinc-700">Password</label>
           <input
             name="password"
-            type="password"
             value={form.password}
             onChange={onChange}
-            placeholder="Minimum 6 characters"
-            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            type="password"
+            placeholder="Password"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
             required
           />
-        </div>
 
-        <button
-          disabled={loading}
-          className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
-        >
-          {loading ? "Creating..." : "Create account"}
-        </button>
-
-        <p className="text-center text-sm text-zinc-600">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-semibold text-zinc-900 hover:underline"
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
           >
-            Sign in
-          </Link>
-        </p>
-      </form>
-    </AuthLayout>
+            {loading ? "Creating..." : "Create Account"}
+          </button>
+
+          {/* Divider */}
+          <div className="relative py-3">
+            <div className="h-px bg-gray-300" />
+            <span className="absolute left-1/2 -translate-x-1/2 -top-2 bg-white px-3 text-sm text-gray-400">
+              OR
+            </span>
+          </div>
+
+          {/* Google Signup */}
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (res) => {
+                try {
+                  const data = await googleLogin(res.credential);
+                  storage.setToken(data.token);
+                  await loadUser();
+                  toast.success("Signed up with Google ✅");
+                  navigate("/dashboard");
+                } catch (err) {
+                  toast.error("Google signup failed");
+                }
+              }}
+              onError={() => toast.error("Google signup failed")}
+            />
+          </div>
+
+          <p className="text-center text-sm text-gray-600 mt-4">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
+        </form>
+      </div>
+    </div>
   );
 }

@@ -1,80 +1,63 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { NavLink, useLocation } from "react-router-dom";
 
 export default function Navbar() {
-  const { isLoggedIn, isAdmin, user, logout } = useAuth();
-  const navigate = useNavigate();
+  const location = useLocation();
+
+  // ❌ Hide navbar on auth pages
+  const hideNavbarRoutes = ["/login", "/register", "/forgot-password"];
+  if (hideNavbarRoutes.includes(location.pathname)) {
+    return null;
+  }
 
   const handleLogout = () => {
-    logout();
-    navigate("/login");
+    localStorage.clear();
+    window.location.href = "/login";
   };
 
+  // ✅ Detect Admin or Department routes
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isDepartmentRoute = location.pathname.startsWith("/department");
+
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="font-bold text-lg tracking-wide">
-          ⚡ Hackathon Starter
-        </Link>
+    <nav className="sticky top-0 z-50 bg-slate-900 shadow-md">
+      <div className="mx-auto max-w-6xl px-4 py-4 flex justify-between items-center">
 
-        <div className="flex items-center gap-3">
-          {!isLoggedIn ? (
+        {/* LOGO */}
+        <div className="text-white font-bold text-lg tracking-wide">
+          ⚡ CIVICWATCH
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="flex items-center gap-6">
+
+          {/* 🔹 NORMAL USER NAV ONLY */}
+          {!isAdminRoute && !isDepartmentRoute && (
             <>
-              <Link
-                to="/login"
-                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="px-3 py-2 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition"
-              >
-                Register
-              </Link>
-              <Link
-                to="/admin/login"
-                className="px-3 py-2 rounded-xl border border-white/15 hover:bg-white/10 transition"
-              >
-                Admin
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/dashboard"
-                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
-              >
+              <NavLink to="/dashboard" className="text-white hover:text-blue-400">
                 Dashboard
-              </Link>
-              <Link
-                to="/account"
-                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
-              >
+              </NavLink>
+
+              <NavLink to="/issues" className="text-white hover:text-blue-400">
+                Issues
+              </NavLink>
+
+              <NavLink to="/issues/new" className="text-white hover:text-blue-400">
+                Report Issue
+              </NavLink>
+
+              <NavLink to="/account" className="text-white hover:text-blue-400">
                 Account
-              </Link>
-
-              {isAdmin && (
-                <Link
-                  to="/admin/dashboard"
-                  className="px-3 py-2 rounded-xl bg-emerald-400 text-black font-semibold hover:bg-emerald-300 transition"
-                >
-                  Admin Panel
-                </Link>
-              )}
-
-              <button
-                onClick={handleLogout}
-                className="px-3 py-2 rounded-xl bg-red-500/90 hover:bg-red-500 transition font-semibold"
-              >
-                Logout
-              </button>
-
-              <div className="hidden sm:block text-sm text-slate-300 ml-2">
-                {user?.email}
-              </div>
+              </NavLink>
             </>
           )}
+
+          {/* 🔴 LOGOUT — FOR ALL */}
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </nav>
