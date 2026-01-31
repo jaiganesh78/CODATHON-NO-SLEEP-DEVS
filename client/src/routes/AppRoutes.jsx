@@ -2,7 +2,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import AdminRoute from "../components/AdminRoute";
+import DepartmentDashboard from "../pages/department/DepartmentDashboard.jsx";
 
+import DepartmentRoute from "../components/DepartmentRoute";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -44,6 +46,15 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+<Route
+  path="/department/dashboard"
+  element={
+    <DepartmentRoute>
+      <DepartmentDashboard />
+    </DepartmentRoute>
+  }
+/>
+
 
       {/* Create Issue */}
       <Route

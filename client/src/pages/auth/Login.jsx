@@ -21,22 +21,31 @@ const onSubmit = async (e) => {
   setLoading(true);
 
   try {
-    // ✅ ADMIN LOGIN
+    // 🔴 ADMIN LOGIN
     if (
       form.email === "admin@hackathon.com" &&
       form.password === "Admin@123"
     ) {
-      localStorage.setItem("admin", "true");
-
-      toast.success("Admin login successful ✅");
-
-      // 🔥 IMPORTANT FIX
+      localStorage.setItem("role", "admin");
+      toast.success("Admin login successful");
       window.location.href = "/admin/dashboard";
       return;
     }
 
-    // ✅ NORMAL USER LOGIN
+    // 🟢 DEPARTMENT LOGIN
+    if (
+      form.email === "dept@hackathon.com" &&
+      form.password === "Dept@123"
+    ) {
+      localStorage.setItem("role", "department");
+      toast.success("Department login successful");
+      window.location.href = "/department/dashboard";
+      return;
+    }
+
+    // 🔵 NORMAL USER LOGIN
     await login(form);
+    localStorage.setItem("role", "user");
     navigate("/dashboard");
 
   } catch (err) {
@@ -45,6 +54,7 @@ const onSubmit = async (e) => {
     setLoading(false);
   }
 };
+
 
 
 
