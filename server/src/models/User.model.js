@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema(
       enum: ["local", "google"],
       default: "local",
     },
+    phone: {
+  type: String,
+  required: false,
+  default: null,
+},
+
     googleId: {
       type: String,
       default: null,
@@ -35,9 +41,27 @@ const userSchema = new mongoose.Schema(
     },
     role: {
   type: String,
-  enum: ["user", "admin"],
+  enum: ["user", "admin", "staff"],
   default: "user",
 },
+
+trust_score: {
+  type: Number,
+  default: 100,
+  min:0,
+  max:100,
+},
+
+is_banned: {
+  type: Boolean,
+  default: false,
+},
+
+ban_until: {
+  type: Date,
+  default: null,
+},
+
 
   },
   { timestamps: true }

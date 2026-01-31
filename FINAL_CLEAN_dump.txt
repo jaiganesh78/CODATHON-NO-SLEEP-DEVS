@@ -1,0 +1,2879 @@
+﻿===== FILE: D:\prince college hackathon\README.md =====
+## Environment Setup
+
+### Server
+```bash
+cd server
+cp .env.example .env
+
+cd client
+cp .env.example .env
+
+
+===== FILE: D:\prince college hackathon\client\eslint.config.js =====
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+])
+
+
+
+===== FILE: D:\prince college hackathon\client\package.json =====
+{
+  "name": "client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-oauth/google": "^0.13.4",
+    "axios": "^1.13.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.12.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "vite": "^7.2.4"
+  }
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\postcss.config.js =====
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+
+
+===== FILE: D:\prince college hackathon\client\README.md =====
+# React + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+
+===== FILE: D:\prince college hackathon\client\tailwind.config.js =====
+export default {
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+
+
+===== FILE: D:\prince college hackathon\client\vite.config.js =====
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+
+
+
+===== FILE: D:\prince college hackathon\client\src\App.jsx =====
+import AppRoutes from "./routes/AppRoutes";
+import Navbar from "./components/Navbar";
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-[#f6f6f6] text-zinc-900">
+      <Navbar />
+      <AppRoutes />
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\main.jsx =====
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+import App from "./App.jsx";
+import AuthProvider from "./context/AuthContext.jsx";
+import "./index.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+          <Toaster position="top-right" />
+        </AuthProvider>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
+  </React.StrictMode>
+);
+
+
+
+===== FILE: D:\prince college hackathon\client\src\api\auth.api.js =====
+import { api } from "./axios";
+
+export const registerUser = async (payload) => {
+  const res = await api.post("/api/auth/register", payload);
+  return res.data;
+};
+
+export const loginUser = async (payload) => {
+  const res = await api.post("/api/auth/login", payload);
+  return res.data;
+};
+
+export const getMe = async () => {
+  const res = await api.get("/api/user/me");
+  return res.data;
+};
+
+export const forgotPassword = async (payload) => {
+  const res = await api.post("/api/auth/forgot-password", payload);
+  return res.data;
+};
+
+export const resetPassword = async (payload) => {
+  const res = await api.post("/api/auth/reset-password", payload);
+  return res.data;
+};
+
+// âœ… Admin test route
+export const getAdminDashboard = async () => {
+  const res = await api.get("/api/admin/dashboard");
+  return res.data;
+};
+export const googleLogin = async (credential) => {
+  const res = await api.post("/api/auth/google", { credential });
+  return res.data;
+};
+
+
+
+===== FILE: D:\prince college hackathon\client\src\api\axios.js =====
+import axios from "axios";
+import { storage } from "../utils/storage";
+
+export const api = axios.create({
+  baseURL: "http://localhost:5000",
+});
+
+api.interceptors.request.use((config) => {
+  const token = storage.getToken();
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+
+
+===== FILE: D:\prince college hackathon\client\src\components\AdminRoute.jsx =====
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import Loader from "./Loader";
+
+export default function AdminRoute({ children }) {
+  const { isLoggedIn, isAdmin, loading } = useAuth();
+
+  if (loading) return <Loader text="Checking admin access..." />;
+
+  if (!isLoggedIn) return <Navigate to="/admin/login" replace />;
+
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
+
+  return children;
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\components\AuthLayout.jsx =====
+import authBg from "../assets/auth-bg.jpg";
+
+export default function AuthLayout({ title, subtitle, children }) {
+  return (
+    <div className="min-h-screen bg-[#f6f6f6]">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
+        {/* LEFT IMAGE */}
+        <div className="hidden lg:block relative overflow-hidden">
+          <img
+            src={authBg}
+            alt="Auth background"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+
+          {/* orange overlay */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/60 via-orange-400/20 to-transparent" />
+
+          <div className="absolute top-8 left-8 flex items-center gap-2">
+            <div className="h-10 w-10 rounded-2xl bg-white/90 flex items-center justify-center font-black text-orange-500">
+              âš¡
+            </div>
+            <div className="text-white font-semibold text-lg">Hackathon</div>
+          </div>
+        </div>
+
+        {/* RIGHT FORM */}
+        <div className="flex items-center justify-center px-6 py-12">
+          <div className="w-full max-w-md">
+            <h1 className="text-2xl font-bold text-zinc-900">{title}</h1>
+            {subtitle ? (
+              <p className="mt-2 text-sm text-zinc-500">{subtitle}</p>
+            ) : null}
+
+            <div className="mt-6 rounded-3xl bg-white p-6 shadow-sm border border-zinc-200">
+              {children}
+            </div>
+
+            <p className="mt-6 text-center text-xs text-zinc-400">
+              Built for speed. Designed to win.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\components\Loader.jsx =====
+export default function Loader({ text = "Loading..." }) {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="text-lg font-semibold">{text}</div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\components\Navbar.jsx =====
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+
+export default function Navbar() {
+  const { isLoggedIn, isAdmin, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  return (
+    <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur">
+      <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+        <Link to="/" className="font-bold text-lg tracking-wide">
+          âš¡ Hackathon Starter
+        </Link>
+
+        <div className="flex items-center gap-3">
+          {!isLoggedIn ? (
+            <>
+              <Link
+                to="/login"
+                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="px-3 py-2 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition"
+              >
+                Register
+              </Link>
+              <Link
+                to="/admin/login"
+                className="px-3 py-2 rounded-xl border border-white/15 hover:bg-white/10 transition"
+              >
+                Admin
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/dashboard"
+                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/account"
+                className="px-3 py-2 rounded-xl hover:bg-white/10 transition"
+              >
+                Account
+              </Link>
+
+              {isAdmin && (
+                <Link
+                  to="/admin/dashboard"
+                  className="px-3 py-2 rounded-xl bg-emerald-400 text-black font-semibold hover:bg-emerald-300 transition"
+                >
+                  Admin Panel
+                </Link>
+              )}
+
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 rounded-xl bg-red-500/90 hover:bg-red-500 transition font-semibold"
+              >
+                Logout
+              </button>
+
+              <div className="hidden sm:block text-sm text-slate-300 ml-2">
+                {user?.email}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\components\ProtectedRoute.jsx =====
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import Loader from "./Loader";
+
+export default function ProtectedRoute({ children }) {
+  const { isLoggedIn, loading } = useAuth();
+
+  if (loading) return <Loader text="Checking login..." />;
+
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
+
+  return children;
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\context\AuthContext.jsx =====
+import { createContext, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { storage } from "../utils/storage";
+import { getMe, loginUser } from "../api/auth.api";
+
+export const AuthContext = createContext(null);
+
+export default function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // checks auth on page refresh
+
+  const loadUser = async () => {
+    try {
+      const token = storage.getToken();
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      const data = await getMe();
+      setUser(data.user);
+    } catch (err) {
+      storage.removeToken();
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const login = async ({ email, password }) => {
+    const data = await loginUser({ email, password });
+
+    storage.setToken(data.token);
+    setUser(data.user);
+
+    toast.success("Logged in âœ…");
+    return data;
+  };
+
+  const logout = () => {
+    storage.removeToken();
+    setUser(null);
+    toast.success("Logged out âœ…");
+  };
+
+  const value = {
+    user,
+    loading,
+    login,
+    logout,
+    loadUser,
+    isLoggedIn: !!user,
+    isAdmin: user?.role === "admin",
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\hooks\useAuth.js =====
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\account\Account.jsx =====
+import { useAuth } from "../../hooks/useAuth";
+
+export default function Account() {
+  const { user } = useAuth();
+
+  return (
+    <div className="min-h-[calc(100vh-72px)] bg-[#f6f6f6]">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="rounded-3xl bg-white border border-zinc-200 p-8 shadow-sm">
+          <p className="text-sm text-zinc-500">Account</p>
+          <h1 className="mt-2 text-3xl font-bold text-zinc-900">
+            Profile Details
+          </h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Basic account information (safe to show).
+          </p>
+
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-5">
+              <p className="text-xs text-zinc-500">Name</p>
+              <p className="mt-2 text-lg font-bold text-zinc-900">{user?.name}</p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-5">
+              <p className="text-xs text-zinc-500">Email</p>
+              <p className="mt-2 text-lg font-bold text-zinc-900">{user?.email}</p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-5">
+              <p className="text-xs text-zinc-500">Role</p>
+              <p className="mt-2 text-lg font-bold text-zinc-900">{user?.role}</p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-5">
+              <p className="text-xs text-zinc-500">Provider</p>
+              <p className="mt-2 text-lg font-bold text-zinc-900">{user?.provider}</p>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-orange-200 bg-orange-50 p-5">
+            <p className="font-semibold text-orange-700">
+              Tip âœ…
+            </p>
+            <p className="mt-1 text-sm text-orange-700/90">
+              For hackathon: keep account simple. Donâ€™t waste time building profile edits unless required.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\admin\AdminDashboard.jsx =====
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { getAdminDashboard } from "../../api/auth.api";
+
+export default function AdminDashboard() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    try {
+      setLoading(true);
+      const res = await getAdminDashboard();
+      setData(res);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Admin API failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  return (
+    <div className="min-h-[calc(100vh-72px)] bg-[#f6f6f6]">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="rounded-3xl bg-white border border-zinc-200 p-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div>
+              <p className="text-sm text-zinc-500">Admin Panel</p>
+              <h1 className="mt-2 text-3xl font-bold text-zinc-900">
+                Control Center
+              </h1>
+              <p className="mt-2 text-sm text-zinc-600">
+                Only admins can access this route.
+              </p>
+            </div>
+
+            <span className="rounded-full bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 text-xs font-semibold">
+              Admin Only
+            </span>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-5">
+              <p className="text-xs text-zinc-500">Access Level</p>
+              <p className="mt-2 text-lg font-bold text-zinc-900">Admin âœ…</p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-5">
+              <p className="text-xs text-zinc-500">Purpose</p>
+              <p className="mt-2 text-lg font-bold text-zinc-900">RBAC Test</p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-5">
+              <p className="text-xs text-zinc-500">Status</p>
+              <p className="mt-2 text-lg font-bold text-zinc-900">
+                {loading ? "Loading..." : "Active"}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-950 p-5 text-white">
+            <p className="text-sm font-semibold text-orange-300">
+              Admin API Response
+            </p>
+
+            <div className="mt-3">
+              {loading ? (
+                <p className="text-sm text-zinc-300">Fetching admin data...</p>
+              ) : (
+                <pre className="text-xs text-zinc-200 whitespace-pre-wrap">
+{JSON.stringify(data, null, 2)}
+                </pre>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\auth\AdminLogin.jsx =====
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import AuthLayout from "../../components/AuthLayout";
+import { useAuth } from "../../hooks/useAuth";
+
+export default function AdminLogin() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const data = await login(form);
+
+      if (data.user?.role !== "admin") {
+        toast.error("Not an admin âŒ");
+        return navigate("/dashboard");
+      }
+
+      toast.success("Admin access granted âœ…");
+      navigate("/admin/dashboard");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Admin login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout title="Admin Sign in" subtitle="Restricted access. Admins only.">
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div>
+          <label className="text-sm font-medium text-zinc-700">Admin Email</label>
+          <input
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={onChange}
+            placeholder="admin@example.com"
+            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-zinc-700">Password</label>
+          <input
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={onChange}
+            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            required
+          />
+        </div>
+
+        <button
+          disabled={loading}
+          className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
+        >
+          {loading ? "Entering..." : "Enter Admin Panel"}
+        </button>
+
+        <div className="flex justify-between text-sm text-zinc-600">
+          <Link to="/login" className="hover:underline">
+            User login â†’
+          </Link>
+          <Link to="/register" className="hover:underline">
+            Create account â†’
+          </Link>
+        </div>
+      </form>
+    </AuthLayout>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\auth\ForgotPassword.jsx =====
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { forgotPassword } from "../../api/auth.api";
+import { toast } from "react-hot-toast";
+
+export default function ForgotPassword() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await forgotPassword({ email });
+      toast.success("OTP sent âœ… Check your email");
+      navigate("/reset-password", { state: { email } });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-14">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-10 shadow-xl max-w-xl mx-auto">
+        <h2 className="text-3xl font-extrabold">Forgot password</h2>
+        <p className="text-slate-300 mt-2">
+          Weâ€™ll send an OTP to reset your password.
+        </p>
+
+        <form onSubmit={onSubmit} className="mt-8 space-y-4">
+          <div>
+            <label className="text-sm text-slate-300">Email</label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              placeholder="you@example.com"
+              className="mt-2 w-full rounded-2xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:border-emerald-400"
+              required
+            />
+          </div>
+
+          <button
+  disabled={loading}
+  className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
+>
+  {loading ? "Signing in..." : "Sign in"}
+</button>
+
+
+          <p className="text-sm text-slate-300">
+            Back to{" "}
+            <Link to="/login" className="text-emerald-300 hover:text-emerald-200">
+              Login â†’
+            </Link>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\auth\Login.jsx =====
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import AuthLayout from "../../components/AuthLayout";
+import { useAuth } from "../../hooks/useAuth";
+import googleIcon from "../../assets/google.png";
+import { GoogleLogin } from "@react-oauth/google";
+import { googleLogin } from "../../api/auth.api";
+import { storage } from "../../utils/storage";
+import { toast } from "react-hot-toast";
+export default function Login() {
+  const { login, loadUser } = useAuth();
+
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await login(form);
+      navigate("/dashboard");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Sign in"
+      subtitle="Enter your email and password to access your account."
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div>
+          <label className="text-sm font-medium text-zinc-700">Email</label>
+          <input
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={onChange}
+            placeholder="you@example.com"
+            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-900"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-zinc-700">Password</label>
+          <input
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={onChange}
+            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-900"
+            required
+          />
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <label className="flex items-center gap-2 text-zinc-600">
+            <input type="checkbox" className="h-4 w-4 rounded border-zinc-300" />
+            Remember me
+          </label>
+
+          <Link
+            to="/forgot-password"
+            className="font-medium text-zinc-900 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
+        <button
+  disabled={loading}
+  className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
+>
+  {loading ? "Signing in..." : "Sign in"}
+</button>
+
+
+        <div className="relative py-2">
+          <div className="h-px w-full bg-zinc-200" />
+          <span className="absolute left-1/2 -translate-x-1/2 -top-1 bg-white px-3 text-xs text-zinc-400">
+            OR
+          </span>
+        </div>
+
+        {/* Google placeholder */}
+       <div className="flex justify-center">
+  <GoogleLogin
+    onSuccess={async (credentialResponse) => {
+      try {
+        const data = await googleLogin(credentialResponse.credential);
+        storage.setToken(data.token);
+        await loadUser();
+        toast.success("Google login success âœ…");
+        navigate("/dashboard");
+      } catch (err) {
+        toast.error(err?.response?.data?.message || "Google login failed");
+      }
+    }}
+    onError={() => toast.error("Google login failed")}
+  />
+</div>
+
+
+
+        <p className="text-center text-sm text-zinc-600">
+          Donâ€™t have an account?{" "}
+          <Link to="/register" className="font-semibold text-zinc-900 hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </form>
+    </AuthLayout>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\auth\Register.jsx =====
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { GoogleLogin } from "@react-oauth/google";
+
+import AuthLayout from "../../components/AuthLayout";
+import { registerUser, googleLogin } from "../../api/auth.api";
+import { storage } from "../../utils/storage";
+import { useAuth } from "../../hooks/useAuth";
+
+export default function Register() {
+  const navigate = useNavigate();
+  const { loadUser } = useAuth();
+
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await registerUser(form);
+      toast.success("Account created âœ…");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Register failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout title="Create account" subtitle="Create your account in seconds.">
+      <form onSubmit={onSubmit} className="space-y-4">
+        {/* âœ… Google Signup */}
+        <div className="flex justify-center">
+          <GoogleLogin
+            text="signup_with"
+            onSuccess={async (credentialResponse) => {
+              try {
+                const data = await googleLogin(credentialResponse.credential);
+
+                storage.setToken(data.token);
+                await loadUser();
+
+                toast.success("Signed up with Google âœ…");
+                navigate("/dashboard");
+              } catch (err) {
+                toast.error(err?.response?.data?.message || "Google signup failed");
+              }
+            }}
+            onError={() => toast.error("Google signup failed")}
+          />
+        </div>
+
+        {/* divider */}
+        <div className="relative py-2">
+          <div className="h-px w-full bg-zinc-200" />
+          <span className="absolute left-1/2 -translate-x-1/2 -top-1 bg-white px-3 text-xs text-zinc-400">
+            OR
+          </span>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-zinc-700">Name</label>
+          <input
+            name="name"
+            value={form.name}
+            onChange={onChange}
+            placeholder="Your name"
+            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-zinc-700">Email</label>
+          <input
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={onChange}
+            placeholder="you@example.com"
+            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-zinc-700">Password</label>
+          <input
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={onChange}
+            placeholder="Minimum 6 characters"
+            className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500"
+            required
+          />
+        </div>
+
+        <button
+          disabled={loading}
+          className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
+        >
+          {loading ? "Creating..." : "Create account"}
+        </button>
+
+        <p className="text-center text-sm text-zinc-600">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-zinc-900 hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </form>
+    </AuthLayout>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\auth\ResetPassword.jsx =====
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { resetPassword } from "../../api/auth.api";
+import { toast } from "react-hot-toast";
+
+export default function ResetPassword() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: location?.state?.email || "",
+    otp: "",
+    newPassword: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await resetPassword(form);
+      toast.success("Password reset âœ… Now login");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Reset failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-14">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-10 shadow-xl max-w-xl mx-auto">
+        <h2 className="text-3xl font-extrabold">Reset password</h2>
+        <p className="text-slate-300 mt-2">
+          Enter OTP and set a new password.
+        </p>
+
+        <form onSubmit={onSubmit} className="mt-8 space-y-4">
+          <div>
+            <label className="text-sm text-slate-300">Email</label>
+            <input
+              name="email"
+              value={form.email}
+              onChange={onChange}
+              type="email"
+              className="mt-2 w-full rounded-2xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:border-emerald-400"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-slate-300">OTP</label>
+            <input
+              name="otp"
+              value={form.otp}
+              onChange={onChange}
+              placeholder="6-digit OTP"
+              className="mt-2 w-full rounded-2xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:border-emerald-400"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-slate-300">New Password</label>
+            <input
+              name="newPassword"
+              value={form.newPassword}
+              onChange={onChange}
+              type="password"
+              placeholder="Minimum 6 characters"
+              className="mt-2 w-full rounded-2xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:border-emerald-400"
+              required
+            />
+          </div>
+
+          <button
+  disabled={loading}
+  className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
+>
+  {loading ? "Signing in..." : "Sign in"}
+</button>
+
+
+          <p className="text-sm text-slate-300">
+            Back to{" "}
+            <Link to="/login" className="text-emerald-300 hover:text-emerald-200">
+              Login â†’
+            </Link>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\dashboard\Dashboard.jsx =====
+import { useAuth } from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
+
+export default function Dashboard() {
+  const { user, isAdmin } = useAuth();
+
+  return (
+    <div className="min-h-[calc(100vh-72px)] bg-[#f6f6f6]">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-sm text-zinc-500">Dashboard</p>
+            <h1 className="mt-1 text-3xl font-bold text-zinc-900">
+              Welcome, {user?.name || "User"} ðŸ‘‹
+            </h1>
+            <p className="mt-2 text-sm text-zinc-600">
+              Youâ€™re signed in as <span className="font-semibold">{user?.email}</span>
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <Link
+              to="/account"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition"
+            >
+              Account
+            </Link>
+
+            {isAdmin && (
+              <Link
+                to="/admin/dashboard"
+                className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 transition"
+              >
+                Admin Panel
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Cards */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-2xl bg-white border border-zinc-200 p-6 shadow-sm">
+            <p className="text-sm text-zinc-500">Role</p>
+            <p className="mt-2 text-lg font-bold text-zinc-900">{user?.role}</p>
+          </div>
+
+          <div className="rounded-2xl bg-white border border-zinc-200 p-6 shadow-sm">
+            <p className="text-sm text-zinc-500">Provider</p>
+            <p className="mt-2 text-lg font-bold text-zinc-900">{user?.provider}</p>
+          </div>
+
+          <div className="rounded-2xl bg-white border border-zinc-200 p-6 shadow-sm">
+            <p className="text-sm text-zinc-500">Status</p>
+            <p className="mt-2 text-lg font-bold text-zinc-900">Authenticated âœ…</p>
+          </div>
+        </div>
+
+        {/* Main panel */}
+        <div className="mt-6 rounded-3xl bg-white border border-zinc-200 p-6 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-zinc-900">
+                Ready for the hackathon module
+              </h2>
+              <p className="mt-1 text-sm text-zinc-600">
+                This is where youâ€™ll plug your problem statement features.
+              </p>
+            </div>
+
+            <span className="rounded-full bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 text-xs font-semibold">
+              Starter Ready
+            </span>
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-4">
+              <p className="font-semibold text-zinc-900">Feature Module 1</p>
+              <p className="text-sm text-zinc-600 mt-1">
+                Add your first hackathon workflow here.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-4">
+              <p className="font-semibold text-zinc-900">Feature Module 2</p>
+              <p className="text-sm text-zinc-600 mt-1">
+                Integrate APIs / DB actions cleanly.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-[#fafafa] p-4">
+              <p className="font-semibold text-zinc-900">Feature Module 3</p>
+              <p className="text-sm text-zinc-600 mt-1">
+                Build admin tools if needed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\pages\home\Home.jsx =====
+import { Link } from "react-router-dom";
+
+export default function Home() {
+  return (
+    
+    <div className="mx-auto max-w-6xl px-4 py-16">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-10 shadow-xl">
+        <p className="text-sm text-slate-400">Hackathon Auth Starter</p>
+
+        <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-red-400">
+  Tailwind Applied âœ…
+</h1>
+
+
+        <p className="mt-4 text-slate-300 max-w-2xl">
+          Manual login + JWT + Forgot Password OTP + Admin roles. Youâ€™re ready to
+          plug in any hackathon problem statement without rebuilding auth again.
+        </p>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            to="/login"
+            className="rounded-2xl bg-white px-5 py-3 text-black font-semibold hover:bg-white/90 transition"
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="rounded-2xl border border-white/15 px-5 py-3 font-semibold hover:bg-white/10 transition"
+          >
+            Create Account
+          </Link>
+          <Link
+            to="/admin/login"
+            className="rounded-2xl bg-emerald-400 px-5 py-3 text-black font-semibold hover:bg-emerald-300 transition"
+          >
+            Admin Login
+          </Link>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+            <p className="font-semibold">JWT Auth</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Secure protected routes using Bearer tokens.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+            <p className="font-semibold">OTP Reset</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Forgot password via email OTP using SendGrid.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+            <p className="font-semibold">Admin Role</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Admin-only routes powered by backend middleware.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\routes\AppRoutes.jsx =====
+import { Routes, Route, Navigate } from "react-router-dom";
+
+import ProtectedRoute from "../components/protectedRoute";
+import AdminRoute from "../components/AdminRoute";
+
+import Home from "../pages/home/Home";
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
+import AdminLogin from "../pages/auth/AdminLogin";
+
+import Dashboard from "../pages/dashboard/Dashboard";
+import Account from "../pages/account/Account";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+
+      {/* User protected */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute>
+            <Account />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin protected */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        }
+      />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+
+
+===== FILE: D:\prince college hackathon\client\src\utils\storage.js =====
+export const storage = {
+  getToken: () => localStorage.getItem("token"),
+  setToken: (token) => localStorage.setItem("token", token),
+  removeToken: () => localStorage.removeItem("token"),
+};
+
+
+
+===== FILE: D:\prince college hackathon\server\check.js =====
+require("dotenv").config();
+const axios = require("axios");
+
+async function listModels() {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    console.error("âŒ GEMINI_API_KEY not found in .env");
+    return;
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+
+  try {
+    const response = await axios.get(url);
+
+    console.log("âœ… AVAILABLE MODELS:\n");
+
+    response.data.models.forEach((model) => {
+      console.log("MODEL ID:", model.name);
+      console.log("SUPPORTED METHODS:", model.supportedGenerationMethods);
+      console.log("--------------------------------------------------");
+    });
+  } catch (error) {
+    console.error(
+      "âŒ ERROR FETCHING MODELS:",
+      error.response?.data || error.message
+    );
+  }
+}
+
+listModels();
+
+
+
+===== FILE: D:\prince college hackathon\server\package.json =====
+{
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@sendgrid/mail": "^8.1.6",
+    "axios": "^1.13.4",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "form-data": "^4.0.5",
+    "fs": "^0.0.1-security",
+    "google-auth-library": "^10.5.0",
+    "groq-sdk": "^0.37.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.1.4",
+    "openai": "^6.17.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  }
+}
+
+
+
+===== FILE: D:\prince college hackathon\server\src\app.js =====
+const express = require("express");
+const cors = require("cors");
+
+const { CLIENT_URL } = require("./config/env");
+const issueRoutes = require("./modules/issue/issue.routes");
+
+const authRoutes = require("./modules/auth/auth.routes");
+const userRoutes = require("./modules/user/user.routes");
+const adminRoutes = require("./modules/admin/admin.routes");
+
+const app = express();
+
+app.use(express.json());
+
+app.use(
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  })
+);
+
+app.get("/", (req, res) => {
+  res.send("âœ… Hackathon Auth API Running");
+});
+
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/issues", issueRoutes);
+app.use("/api/staff/issues", require("./modules/issue/issue.staff.routes"));
+
+
+
+module.exports = app;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\server.js =====
+const env = require("./config/env"); // loads dotenv
+const app = require("./app");
+const connectDB = require("./config/db");
+const seedAdmin = require("./utils/seedAdmin");
+
+const PORT = env.PORT || 5000;
+
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    // âœ… create admin in DB if not exists
+    await seedAdmin();
+
+    app.listen(PORT, () => {
+      console.log(`âœ… Server running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("âŒ Server failed to start:", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+
+
+===== FILE: D:\prince college hackathon\server\src\config\db.js =====
+const mongoose = require("mongoose");
+const { MONGO_URI } = require("./env");
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log("âœ… MongoDB Connected");
+  } catch (error) {
+    console.error("âŒ MongoDB Connection Failed:", error.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\config\env.js =====
+require("dotenv").config();
+
+const requiredVars = [
+  "PORT",
+  "MONGO_URI",
+  "JWT_SECRET",
+  "JWT_EXPIRES_IN",
+  "CLIENT_URL",
+  "SENDGRID_API_KEY",
+  "SENDER_EMAIL",
+  "ADMIN_EMAIL",
+  "ADMIN_PASSWORD",
+  "ADMIN_NAME",
+  "GOOGLE_CLIENT_ID"
+];
+
+requiredVars.forEach((key) => {
+  if (!process.env[key]) {
+    console.warn(`âš ï¸ Missing env variable: ${key}`);
+  }
+});
+
+module.exports = {
+  PORT: process.env.PORT,
+  MONGO_URI: process.env.MONGO_URI,
+  JWT_SECRET: process.env.JWT_SECRET,
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  CLIENT_URL: process.env.CLIENT_URL,
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+  SENDER_EMAIL: process.env.SENDER_EMAIL,
+  ADMIN_EMAIL:process.env.ADMIN_EMAIL,
+  ADMIN_PASSWORD:process.env.ADMIN_PASSWORD,
+  ADMIN_NAME:process.env.ADMIN_NAME,
+  GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID
+};
+
+
+
+===== FILE: D:\prince college hackathon\server\src\middleware\admin.middleware.js =====
+const adminMiddleware = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admin access required" });
+  }
+  next();
+};
+
+module.exports = adminMiddleware;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\middleware\auth.middleware.js =====
+const { verifyToken } = require("../utils/jwt");
+
+const authMiddleware = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = verifyToken(token);
+
+   req.user = decoded; // { userId, email, role }
+
+// ðŸš« Enforce ban
+if (req.user.is_banned && req.user.ban_until) {
+  if (new Date(req.user.ban_until) > new Date()) {
+    return res.status(403).json({
+      message: "User is temporarily banned",
+    });
+  }
+}
+
+next();
+
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+module.exports = authMiddleware;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\middleware\error.middleware.js =====
+
+
+===== FILE: D:\prince college hackathon\server\src\middleware\role.middleware.js =====
+const requireRole = (roles = []) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied: insufficient permissions",
+      });
+    }
+    next();
+  };
+};
+
+module.exports = requireRole;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\models\Issue.model.js =====
+const mongoose = require("mongoose");
+
+const issueSchema = new mongoose.Schema(
+  {
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    latitude: {
+      type: Number,
+      required: true,
+    },
+
+    longitude: {
+      type: Number,
+      required: true,
+    },
+
+    status: {
+      type: String,
+      enum: [
+        "open",
+        "assigned",
+        "resolved_pending_verification",
+        "closed",
+        "rejected",
+      ],
+      default: "open",
+    },
+
+    priority_score: {
+      type: Number,
+      default: 0,
+    },
+
+    ai_confidence: {
+      type: Number,
+      default: null,
+    },
+
+    assigned_department_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      default: null,
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Issue", issueSchema);
+
+
+
+===== FILE: D:\prince college hackathon\server\src\models\PasswordResetOtp.model.js =====
+const mongoose = require("mongoose");
+
+const passwordResetOtpSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    otpHash: {
+      type: String,
+      required: true,
+    },
+    expiresAt: {
+      type: Date,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("PasswordResetOtp", passwordResetOtpSchema);
+
+
+
+===== FILE: D:\prince college hackathon\server\src\models\User.model.js =====
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 50,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      default: null, // null for Google users
+    },
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    googleId: {
+      type: String,
+      default: null,
+    },
+    avatar: {
+      type: String,
+      default: null,
+    },
+    role: {
+  type: String,
+  enum: ["user", "admin", "staff"],
+  default: "user",
+},
+
+trust_score: {
+  type: Number,
+  default: 100,
+},
+
+is_banned: {
+  type: Boolean,
+  default: false,
+},
+
+ban_until: {
+  type: Date,
+  default: null,
+},
+
+
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("User", userSchema);
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\admin\admin.controller.js =====
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\admin\admin.routes.js =====
+const express = require("express");
+const authMiddleware = require("../../middleware/auth.middleware");
+const adminMiddleware = require("../../middleware/admin.middleware");
+
+const router = express.Router();
+
+// âœ… Test admin route
+router.get("/dashboard", authMiddleware, adminMiddleware, (req, res) => {
+  return res.status(200).json({
+    message: "Welcome Admin âœ…",
+    admin: req.user, // shows role in token
+  });
+});
+
+module.exports = router;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\ai\aiAnalysis.service.js =====
+const Groq = require("groq-sdk");
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+// STRICT ENUMS
+const ALLOWED_CATEGORIES = [
+  "garbage_overflow",
+  "pothole",
+  "water_stagnation",
+  "drainage_overflow",
+  "street_light_failure",
+  "hospital_infrastructure",
+  "other",
+];
+
+const ALLOWED_PRIORITIES = [30, 50, 70, 90];
+
+async function analyzeIssueWithAI({ raw_description, vision_labels = [] }) {
+  const systemPrompt = `
+You are an AI assistant for a civic issue reporting platform.
+
+You MUST return STRICT JSON only. No markdown. No extra text.
+
+TASKS:
+1. Summarize the issue in ONE clear sentence (max 20 words).
+2. Classify the issue into ONE allowed category.
+3. Assign a numeric priority score based ONLY on the ORIGINAL description severity.
+
+RULES:
+- Allowed categories ONLY:
+  ${ALLOWED_CATEGORIES.join(", ")}
+- Allowed priority scores ONLY:
+  30 (LOW), 50 (MEDIUM), 70 (HIGH), 90 (CRITICAL)
+- Priority MUST be decided from ORIGINAL description, NOT summary.
+- Higher priority for:
+  - hospital infrastructure
+  - emergencies, danger, accidents, children
+  - sewage overflow, flooding, fire
+
+OUTPUT JSON FORMAT:
+{
+  "summary": "",
+  "category": "",
+  "confidence": 0.0,
+  "priority_score": 0,
+  "reasoning": ""
+}
+`;
+
+  const userPrompt = `
+Original Description:
+"${raw_description}"
+
+Image Context Labels:
+${vision_labels.join(", ")}
+`;
+
+  let content;
+
+  try {
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      temperature: 0.2,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+
+    content = completion.choices[0].message.content;
+  } catch (err) {
+    console.error("GROQ API ERROR:", err);
+    throw new Error("AI_SERVICE_FAILED");
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch (err) {
+    console.error("GROQ RAW RESPONSE:", content);
+    throw new Error("AI_INVALID_JSON");
+  }
+
+  // HARD VALIDATION (DO NOT TRUST AI BLINDLY)
+  if (
+    !ALLOWED_CATEGORIES.includes(parsed.category) ||
+    !ALLOWED_PRIORITIES.includes(parsed.priority_score) ||
+    typeof parsed.confidence !== "number"
+  ) {
+    throw new Error("AI_INVALID_OUTPUT");
+  }
+
+  return {
+    summary: parsed.summary,
+    category: parsed.category,
+    ai_confidence: parsed.confidence,
+    priority_score: parsed.priority_score,
+    reasoning: parsed.reasoning,
+  };
+}
+
+module.exports = { analyzeIssueWithAI };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\ai\visionAnalysis.service.js =====
+const axios = require("axios");
+const fs = require("fs");
+const FormData = require("form-data");
+
+const HF_API_URL =
+  "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32";
+
+// MUST MATCH TEXT CATEGORIES EXACTLY
+const CATEGORIES = [
+  "garbage_overflow",
+  "pothole",
+  "water_stagnation",
+  "drainage_overflow",
+  "street_light_failure",
+  "hospital_infrastructure",
+  "other",
+];
+
+// Convert category â†’ human readable prompt
+const CATEGORY_PROMPTS = {
+  garbage_overflow: "a photo of garbage overflow on the street",
+  pothole: "a photo of a pothole on the road",
+  water_stagnation: "a photo of stagnant water on a street",
+  drainage_overflow: "a photo of sewage or drainage overflow",
+  street_light_failure: "a photo of a broken street light",
+  hospital_infrastructure: "a photo of a hospital or public medical building",
+  other: "a photo unrelated to civic infrastructure",
+};
+
+async function analyzeImageWithVision(imagePath) {
+  const imageBuffer = fs.readFileSync(imagePath);
+
+  const formData = new FormData();
+  formData.append("file", imageBuffer);
+
+  const payload = {
+    inputs: {
+      image: imageBuffer.toString("base64"),
+      candidate_labels: CATEGORIES.map((c) => CATEGORY_PROMPTS[c]),
+    },
+  };
+
+  let response;
+
+  try {
+    response = await axios.post(HF_API_URL, payload, {
+      headers: {
+        Authorization: `Bearer ${process.env.HF_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      timeout: 20000,
+    });
+  } catch (err) {
+    console.error("HF IMAGE API ERROR:", err.response?.data || err.message);
+    throw new Error("IMAGE_AI_FAILED");
+  }
+
+  const results = response.data;
+
+  // Find best category
+  let best = {
+    category: "other",
+    confidence: 0.1,
+  };
+
+  results.forEach((item) => {
+    const category = Object.keys(CATEGORY_PROMPTS).find(
+      (key) => CATEGORY_PROMPTS[key] === item.label
+    );
+
+    if (category && item.score > best.confidence) {
+      best = {
+        category,
+        confidence: item.score,
+      };
+    }
+  });
+
+  return {
+    image_category: best.category,
+    image_confidence: best.confidence,
+    raw_predictions: results,
+  };
+}
+
+module.exports = { analyzeImageWithVision };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\auth\auth.controller.js =====
+const User = require("../../models/User.model");
+const PasswordResetOtp = require("../../models/PasswordResetOtp.model");
+
+const { hashPassword, comparePassword } = require("../../utils/hash");
+const { signToken } = require("../../utils/jwt");
+const { sendEmail } = require("../../utils/mailer");
+
+const bcrypt = require("bcrypt");
+
+// âœ… REGISTER (Manual Signup)
+const register = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already registered" });
+    }
+
+    const hashed = await hashPassword(password);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashed,
+      provider: "local",
+    });
+
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        provider: user.provider,
+      },
+    });
+  } catch (error) {
+    console.error("REGISTER ERROR:", error.message);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// âœ… LOGIN (Manual Login + JWT)
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+    if (user.provider !== "local") {
+      return res
+        .status(400)
+        .json({ message: "Use Google login for this account" });
+    }
+
+    const match = await comparePassword(password, user.password);
+    if (!match) return res.status(401).json({ message: "Invalid credentials" });
+
+    const token = signToken({
+  userId: user._id,
+  email: user.email,
+  role: user.role,
+});
+
+
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        provider: user.provider,
+      },
+    });
+  } catch (error) {
+    console.error("LOGIN ERROR:", error.message);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// âœ… FORGOT PASSWORD (Send OTP)
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email });
+
+    // âœ… security: don't reveal if email exists
+    if (!user) {
+      return res.status(200).json({
+        message: "If the email exists, OTP will be sent",
+      });
+    }
+
+    if (user.provider !== "local") {
+      return res.status(400).json({
+        message: "This account uses Google login. Password reset not allowed.",
+      });
+    }
+
+    // âœ… Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // âœ… Hash OTP before storing (secure)
+    const otpHash = await bcrypt.hash(otp, 10);
+
+    // âœ… Expire in 10 mins
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // âœ… Remove old OTPs for this email
+    await PasswordResetOtp.deleteMany({ email });
+
+    // âœ… Store new OTP
+    await PasswordResetOtp.create({
+      email,
+      otpHash,
+      expiresAt,
+    });
+
+    // âœ… Send OTP via SendGrid
+    await sendEmail({
+      to: email,
+      subject: "Password Reset OTP",
+      text: `Your OTP is ${otp}. It will expire in 10 minutes.`,
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>Password Reset OTP</h2>
+          <p>Your OTP is:</p>
+          <h1 style="letter-spacing: 2px;">${otp}</h1>
+          <p>This OTP will expire in <b>10 minutes</b>.</p>
+          <p>If you didnâ€™t request this, ignore this email.</p>
+        </div>
+      `,
+    });
+
+    return res.status(200).json({
+      message: "OTP sent to email (if account exists)",
+    });
+  } catch (error) {
+    console.error("FORGOT PASSWORD ERROR:", error.message);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// âœ… RESET PASSWORD (Verify OTP + Update Password)
+const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Email, OTP and newPassword are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    const otpDoc = await PasswordResetOtp.findOne({ email });
+    if (!otpDoc) {
+      return res.status(400).json({ message: "OTP not found or expired" });
+    }
+
+    // âœ… Check expiry
+    if (otpDoc.expiresAt < new Date()) {
+      await PasswordResetOtp.deleteMany({ email });
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    // âœ… Verify OTP
+    const isOtpValid = await bcrypt.compare(otp, otpDoc.otpHash);
+    if (!isOtpValid) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // âœ… Update password
+    const hashed = await hashPassword(newPassword);
+
+    await User.updateOne(
+      { email },
+      { password: hashed, provider: "local" } // provider stays local
+    );
+
+    // âœ… Delete OTP after success
+    await PasswordResetOtp.deleteMany({ email });
+
+    return res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("RESET PASSWORD ERROR:", error.message);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { register, login, forgotPassword, resetPassword };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\auth\auth.routes.js =====
+const express = require("express");
+const { googleAuth } = require("./google.controller");
+
+const {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+} = require("./auth.controller");
+
+
+const router = express.Router();
+
+router.post("/register", register);
+router.post("/login", login);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
+router.post("/google", googleAuth);
+
+module.exports = router;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\auth\auth.service.js =====
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\auth\google.controller.js =====
+const { OAuth2Client } = require("google-auth-library");
+const User = require("../../models/User.model");
+const { signToken } = require("../../utils/jwt");
+const env = require("../../config/env");
+
+const client = new OAuth2Client(env.GOOGLE_CLIENT_ID);
+
+const googleAuth = async (req, res) => {
+  try {
+    const { credential } = req.body; // ID token from frontend
+
+    if (!credential) {
+      return res.status(400).json({ message: "Google credential is required" });
+    }
+
+    if (!env.GOOGLE_CLIENT_ID) {
+      return res.status(500).json({ message: "Google Client ID missing in env" });
+    }
+
+    // âœ… verify Google ID token
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const email = payload.email;
+    const name = payload.name || "Google User";
+    const googleId = payload.sub;
+
+    let user = await User.findOne({ email });
+
+    // âœ… If email already exists as manual account â†’ block Google login
+    if (user && user.provider === "local") {
+      return res.status(400).json({
+        message: "This email is registered with password. Use manual login.",
+      });
+    }
+
+    // âœ… create user if not exists
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        provider: "google",
+        googleId,
+        role: "user",
+      });
+    }
+
+    // âœ… issue your JWT
+    const token = signToken({
+      userId: user._id,
+      email: user.email,
+      role: user.role,
+    });
+
+    return res.status(200).json({
+      message: "Google login success âœ…",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        provider: user.provider,
+      },
+    });
+  } catch (error) {
+    console.error("GOOGLE AUTH ERROR:", error.message);
+    return res.status(500).json({ message: "Google auth failed" });
+  }
+};
+
+module.exports = { googleAuth };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\department\departmentMapping.service.js =====
+const Department = require("../../models/Department.model");
+
+// STATIC CATEGORY â†’ DEPARTMENT NAME MAP
+const CATEGORY_DEPARTMENT_MAP = {
+  garbage_overflow: "Sanitation",
+  pothole: "Roads",
+  water_stagnation: "Water",
+  drainage_overflow: "Drainage",
+  street_light_failure: "Electrical",
+  hospital_infrastructure: "Health",
+};
+
+async function getDepartmentForCategory(category) {
+  const departmentName = CATEGORY_DEPARTMENT_MAP[category];
+
+  if (!departmentName) {
+    return null; // forces admin review
+  }
+
+  const department = await Department.findOne({
+    name: departmentName,
+  });
+
+  return department || null;
+}
+
+module.exports = { getDepartmentForCategory };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\issue\duplicate.service.js =====
+const Issue = require("../../models/Issue.model");
+
+/**
+ * Calculate distance between two geo points (meters)
+ */
+const getDistanceMeters = (lat1, lon1, lat2, lon2) => {
+  const R = 6371000; // Earth radius in meters
+  const toRad = (v) => (v * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
+
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+/**
+ * Find possible duplicate issues
+ */
+const findDuplicateIssues = async ({
+  category,
+  latitude,
+  longitude,
+  radiusMeters = 100,
+  recentDays = 7,
+}) => {
+  const since = new Date();
+  since.setDate(since.getDate() - recentDays);
+
+  const candidates = await Issue.find({
+    category,
+    status: { $ne: "closed" },
+    createdAt: { $gte: since },
+  });
+
+  return candidates.filter((issue) => {
+    const distance = getDistanceMeters(
+      latitude,
+      longitude,
+      issue.latitude,
+      issue.longitude
+    );
+    return distance <= radiusMeters;
+  });
+};
+
+module.exports = { findDuplicateIssues };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\issue\issue.controller.js =====
+const Issue = require("../../models/Issue.model");
+const { findDuplicateIssues } = require("./duplicate.service");
+const { analyzeIssueWithAI } = require("../ai/aiAnalysis.service");
+const { analyzeImageWithVision } = require("../ai/visionAnalysis.service");
+const { reverseGeocode } = require("../location/reverseGeocode.service");
+
+/**
+ * CREATE ISSUE
+ * AI-powered, backend-owned flow
+ */
+const createIssue = async (req, res) => {
+  try {
+    const {
+      description,
+      latitude,
+      longitude,
+      force_duplicate,
+      forced_against_issue_id,
+    } = req.body;
+
+    // ðŸ”’ Basic validation
+    if (!description || description.trim().length < 5) {
+      return res.status(400).json({ message: "Valid description is required" });
+    }
+
+    if (latitude == null || longitude == null) {
+      return res.status(400).json({ message: "Location is required" });
+    }
+
+    if (!req.file?.path) {
+      return res.status(400).json({ message: "Issue image is required" });
+    }
+
+    // 1ï¸âƒ£ TEXT AI ANALYSIS
+    const textAI = await analyzeIssueWithAI({
+      raw_description: description,
+    });
+
+    const {
+      summary,
+      category,
+      ai_confidence: text_confidence,
+      priority_score,
+    } = textAI;
+
+    // 2ï¸âƒ£ IMAGE AI ANALYSIS
+    const imageAI = await analyzeImageWithVision(req.file.path);
+
+    const {
+      image_category,
+      image_confidence,
+      raw_predictions,
+    } = imageAI;
+
+    // 3ï¸âƒ£ FINAL CONFIDENCE (ðŸ”´ THIS IS THE FORMULA ðŸ”´)
+    const final_confidence =
+      (text_confidence + image_confidence) / 2;
+
+    // 4ï¸âƒ£ REVERSE GEOCODING
+    const place = await reverseGeocode(latitude, longitude);
+
+    // 5ï¸âƒ£ DUPLICATE ISSUE DETECTION
+    const duplicates = await findDuplicateIssues({
+      category,
+      latitude,
+      longitude,
+    });
+
+    if (duplicates.length > 0 && force_duplicate !== true) {
+      return res.status(200).json({
+        message: "Similar issues already exist nearby",
+        summary,
+        category,
+        priority_score,
+        place,
+        possible_duplicates: duplicates,
+      });
+    }
+
+    // 6ï¸âƒ£ AUTO ASSIGN DECISION
+    const AUTO_ASSIGN_THRESHOLD = 0.75;
+    const IMAGE_MIN_THRESHOLD = 0.3;
+
+    const autoAssigned =
+      image_confidence >= IMAGE_MIN_THRESHOLD &&
+      final_confidence >= AUTO_ASSIGN_THRESHOLD;
+
+    // 7ï¸âƒ£ FINAL ISSUE CREATION
+    const issue = await Issue.create({
+      user_id: req.user.userId,
+      category,
+      description,
+      latitude,
+      longitude,
+      priority_score,
+
+      text_confidence,
+      image_confidence,
+      ai_confidence: final_confidence,
+
+      image_category,
+      image_raw_predictions: raw_predictions,
+
+      status: autoAssigned ? "assigned_auto" : "open",
+
+      duplicate_forced: force_duplicate === true,
+      forced_against_issue_id:
+        force_duplicate === true ? forced_against_issue_id : null,
+    });
+
+    return res.status(201).json({
+      issue,
+      summary,
+      place,
+      autoAssigned,
+    });
+  } catch (error) {
+    console.error("CREATE ISSUE ERROR:", error);
+
+    if (
+      error.message === "AI_SERVICE_FAILED" ||
+      error.message === "AI_INVALID_JSON" ||
+      error.message === "AI_INVALID_OUTPUT" ||
+      error.message === "IMAGE_AI_FAILED"
+    ) {
+      return res.status(503).json({
+        message:
+          "AI analysis temporarily unavailable. Issue sent for manual review.",
+      });
+    }
+
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * GET ISSUES (sorted by priority)
+ */
+const getIssues = async (req, res) => {
+  const issues = await Issue.find().sort({ priority_score: -1 });
+  res.json({ issues });
+};
+
+module.exports = {
+  createIssue,
+  getIssues,
+};
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\issue\issue.routes.js =====
+const express = require("express");
+const router = express.Router();
+
+const auth = require("../../middleware/auth.middleware");
+const {
+  createIssue,
+  getIssues,
+} = require("./issue.controller");
+
+router.post("/", auth, createIssue);
+router.get("/", auth, getIssues);
+
+module.exports = router;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\issue\issue.staff.controller.js =====
+const Issue = require("../../models/Issue.model");
+
+/**
+ * Department staff resolves an issue
+ * Proof image is mandatory
+ */
+const resolveIssueByStaff = async (req, res) => {
+  try {
+    const issueId = req.params.id;
+    const staffId = req.user.userId;
+    const staffDeptId = req.user.department_id;
+
+    const { fake, fake_reason } = req.body;
+
+    const issue = await Issue.findById(issueId);
+
+    if (!issue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+
+    // ðŸ”’ Ensure issue belongs to staff's department
+    if (
+      !issue.assigned_department_id ||
+      issue.assigned_department_id.toString() !== staffDeptId
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to resolve this issue",
+      });
+    }
+
+    // ðŸ”’ Ensure valid status
+    if (
+      issue.status !== "assigned_auto" &&
+      issue.status !== "assigned"
+    ) {
+      return res.status(400).json({
+        message: "Issue is not in a resolvable state",
+      });
+    }
+
+    // ðŸ”’ Proof image is mandatory
+    if (!req.file?.path) {
+      return res.status(400).json({
+        message: "Resolution proof image is required",
+      });
+    }
+
+    issue.resolution_proof_image = req.file.path;
+    issue.resolved_by = staffId;
+    issue.resolved_at = new Date();
+    issue.status = "resolved_pending_verification";
+
+    // Optional fake flag by staff
+    if (fake === "true") {
+      issue.staff_flagged_fake = true;
+      issue.staff_fake_reason = fake_reason || "No reason provided";
+    }
+
+    await issue.save();
+
+    return res.json({
+      message: "Issue marked as resolved, pending admin verification",
+      issue,
+    });
+  } catch (error) {
+    console.error("STAFF RESOLVE ISSUE ERROR:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { resolveIssueByStaff };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\issue\issue.staff.routes.js =====
+console.log("STAFF ROUTES LOADED");
+
+const express = require("express");
+const router = express.Router();
+
+const { authMiddleware } = require("../../middlewares/auth.middleware");
+const { staffOnly } = require("../../middlewares/staff.middleware");
+const {
+  resolveIssueByStaff,
+} = require("./issue.staff.controller");
+
+// Staff resolves issue with proof
+router.patch(
+  "/:id/resolve",
+  authMiddleware,
+  staffOnly,
+  resolveIssueByStaff
+);
+
+module.exports = router;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\location\reverseGeocode.service.js =====
+const axios = require("axios");
+
+async function reverseGeocode(latitude, longitude) {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
+
+  const response = await axios.get(url, {
+    headers: {
+      "User-Agent": "civic-issue-platform",
+    },
+  });
+
+  const address = response.data.address || {};
+
+  return {
+    area:
+      address.suburb ||
+      address.neighbourhood ||
+      address.village ||
+      address.town ||
+      "",
+    city: address.city || address.county || "",
+    state: address.state || "",
+  };
+}
+
+module.exports = { reverseGeocode };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\user\user.controller.js =====
+const User = require("../../models/User.model");
+
+const getMe = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const user = await User.findById(userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error("GET ME ERROR:", error.message);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { getMe };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\user\user.routes.js =====
+const express = require("express");
+const { getMe } = require("./user.controller");
+const authMiddleware = require("../../middleware/auth.middleware");
+
+const router = express.Router();
+
+router.get("/me", authMiddleware, getMe);
+
+module.exports = router;
+
+
+
+===== FILE: D:\prince college hackathon\server\src\modules\user\user.service.js =====
+
+
+===== FILE: D:\prince college hackathon\server\src\utils\hash.js =====
+const bcrypt = require("bcrypt");
+
+const hashPassword = async (plainPassword) => {
+  const saltRounds = 10;
+  return bcrypt.hash(plainPassword, saltRounds);
+};
+
+const comparePassword = async (plainPassword, hashedPassword) => {
+  return bcrypt.compare(plainPassword, hashedPassword);
+};
+
+module.exports = { hashPassword, comparePassword };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\utils\jwt.js =====
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET, JWT_EXPIRES_IN } = require("../config/env");
+
+const signToken = (payload) => {
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN || "1h",
+  });
+};
+
+const verifyToken = (token) => {
+  return jwt.verify(token, JWT_SECRET);
+};
+
+module.exports = { signToken, verifyToken };
+
+
+
+===== FILE: D:\prince college hackathon\server\src\utils\mailer.js =====
+const sgMail = require("@sendgrid/mail");
+const { SENDGRID_API_KEY, SENDER_EMAIL } = require("../config/env");
+
+sgMail.setApiKey(SENDGRID_API_KEY);
+
+const sendEmail = async ({ to, subject, html, text }) => {
+  const msg = {
+    to,
+    from: SENDER_EMAIL,
+    subject,
+    text,
+    html,
+  };
+console.log("âœ… SENDGRID KEY LOADED?", !!process.env.SENDGRID_API_KEY);
+
+  return sgMail.send(msg);
+};
+
+
+module.exports = { sendEmail };
+console.log("SENDGRID KEY PREFIX:", process.env.SENDGRID_API_KEY?.slice(0, 3));
+
+
+
+
+===== FILE: D:\prince college hackathon\server\src\utils\seedAdmin.js =====
+const User = require("../models/User.model");
+const { hashPassword } = require("./hash");
+const { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NAME } = require("../config/env");
+
+const seedAdmin = async () => {
+  try {
+    if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+      console.log("âš ï¸ Admin seeding skipped (ADMIN_EMAIL or ADMIN_PASSWORD missing)");
+      return;
+    }
+
+    const existingAdmin = await User.findOne({ email: ADMIN_EMAIL });
+
+    if (existingAdmin) {
+      console.log("âœ… Admin already exists in DB");
+      return;
+    }
+
+    const hashed = await hashPassword(ADMIN_PASSWORD);
+
+    await User.create({
+      name: ADMIN_NAME || "Admin",
+      email: ADMIN_EMAIL,
+      password: hashed,
+      provider: "local",
+      role: "admin",
+    });
+
+    console.log("âœ… Admin user created successfully");
+  } catch (error) {
+    console.error("âŒ Admin seeding failed:", error.message);
+  }
+};
+
+module.exports = seedAdmin;
+
+
+
