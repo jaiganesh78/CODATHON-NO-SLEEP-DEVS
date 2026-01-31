@@ -27,8 +27,11 @@ const onSubmit = async (e) => {
       form.password === "Admin@123"
     ) {
       localStorage.setItem("admin", "true");
+
       toast.success("Admin login successful ✅");
-      navigate("/admin/dashboard");
+
+      // 🔥 IMPORTANT FIX
+      window.location.href = "/admin/dashboard";
       return;
     }
 
@@ -42,6 +45,7 @@ const onSubmit = async (e) => {
     setLoading(false);
   }
 };
+
 
 
 return (
